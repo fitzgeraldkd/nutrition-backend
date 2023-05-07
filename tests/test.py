@@ -1,16 +1,13 @@
-from bcrypt import gensalt, hashpw
-
 from api.model import db
-from api.model.user import User
+from tests.factories import UserFactory
 from tests.utils import ApiTestCase
 
 
 class UserTests(ApiTestCase):
 
     def test_user_authentication(self):
-        hashed_password = hashed_password = hashpw('fizz'.encode('utf8'), gensalt())
-        user = User(id=1, email='foo@bar.com', password=hashed_password)
         with self.app.app_context():
+            user = UserFactory(id=1, email='foo@bar.com', raw_password='fizz')
             db.session.add(user)
             db.session.commit()
 
