@@ -30,7 +30,7 @@ class AuthAPI(Resource):
     def post(self):
         payload = request.get_json()
         email = payload.get('email')
-        password = payload.get('password').encode('utf8')
+        password = payload.get('password')
         user = User.query.filter(User.email == email).first()
 
         if user is None:
