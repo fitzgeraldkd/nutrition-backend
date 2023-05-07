@@ -1,31 +1,11 @@
-import os
-import unittest
-
 from bcrypt import gensalt, hashpw
-from dotenv import load_dotenv
-from flask import Flask
 
 from api.model import db
 from api.model.user import User
-from app import setup_resources
+from tests.utils import ApiTestCase
 
 
-class UserTests(unittest.TestCase):
-
-    def setUp(self):
-        load_dotenv('.env.testing')
-        self.app = Flask(__name__)
-        self.app.testing = True
-        self.app.secret_key = os.getenv('secret_key')
-        self.app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
-        self.app.config['TESTING'] = True
-        setup_resources(self.app)
-
-        self.client = self.app.test_client()
-
-    def tearDown(self):
-        with self.app.app_context():
-            db.drop_all()
+class UserTests(ApiTestCase):
 
     def test_user_authentication(self):
         hashed_password = hashed_password = hashpw('fizz'.encode('utf8'), gensalt())
