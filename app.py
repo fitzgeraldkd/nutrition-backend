@@ -2,6 +2,7 @@ import os
 
 from dotenv import load_dotenv
 from flask import Flask
+from flask_cors import CORS
 from flask_restful import Api
 
 from api.model import db
@@ -21,6 +22,8 @@ def setup_resources(app):
     api = Api(app)
     api.add_resource(AuthAPI, '/api/v1.0/auth')
     api.add_resource(UserAPI, '/api/v1.0/users')
+
+    CORS(app, resources={r"/api/*": {"origins": "*"}})
 
     db.init_app(app)
     with app.app_context():
