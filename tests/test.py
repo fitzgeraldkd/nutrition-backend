@@ -6,9 +6,8 @@ from tests.utils import ApiTestCase
 
 class UserTests(ApiTestCase):
     def test_post_with_valid_data(self):
-        with self.app.app_context():
-            user = User.query.filter(User.email == 'kenny@kdfitz.com').first()
-            self.assertIsNone(user)
+        user = User.query.filter(User.email == 'kenny@kdfitz.com').first()
+        self.assertIsNone(user)
 
         response = self.client.post('/api/v1.0/users', json={
             'email': 'kenny@kdfitz.com',
@@ -16,9 +15,8 @@ class UserTests(ApiTestCase):
         })
         self.assertEqual(response.status_code, 200)
 
-        with self.app.app_context():
-            user = User.query.filter(User.email == 'kenny@kdfitz.com').first()
-            self.assertIsNotNone(user)
+        user = User.query.filter(User.email == 'kenny@kdfitz.com').first()
+        self.assertIsNotNone(user)
 
     def test_post_with_invalid_data(self):
         response = self.client.post('/api/v1.0/users', json={
@@ -34,10 +32,7 @@ class UserTests(ApiTestCase):
         self.assertDictEqual(response.json, {'error': 'An email is required.'})
 
     def test_prevent_duplicates(self):
-        with self.app.app_context():
-            user = UserFactory(email='existing@user.com')
-            db.session.add(user)
-            db.session.commit()
+        UserFactory(email='existing@user.com')
         response = self.client.post('/api/v1.0/users', json={
             'email': 'existing@user.com',
             'password': 'TestPassword'
@@ -48,10 +43,7 @@ class UserTests(ApiTestCase):
 class AuthTests(ApiTestCase):
 
     def test_user_authentication(self):
-        with self.app.app_context():
-            user = UserFactory(id=1, email='foo@bar.com', raw_password='fizz')
-            db.session.add(user)
-            db.session.commit()
+        UserFactory(id=1, email='foo@bar.com', raw_password='fizz')
 
         # An invalid email returns a 400.
         response = self.client.post('/api/v1.0/auth', json={
