@@ -3,16 +3,14 @@ from collections import defaultdict
 from sqlalchemy import Column, Float, ForeignKey, Integer
 
 from api.model import db
-from api.model.utils import create_join_table
-
-
-# RecipeIngredients = create_join_table('recipe_ingredients', 'recipe', 'ingredient')
-MealDishes = create_join_table('meal_dishes', 'meal', 'dish')
-MealIngredients = create_join_table('meal_ingredients', 'meal', 'ingredient')
-MealRecipes = create_join_table('meal_recipes', 'meal', 'recipe')
 
 
 class NutritionFields:
+    """
+    Common fields for tables that store nutrition information.
+
+    TODO: Add serving size measurement and other relevant nutritional fields.
+    """
     calories = Column(Integer)
     serving_size = Column(Integer)
 
@@ -23,55 +21,41 @@ class NutritionFields:
         }
 
 class Ingredient(db.Model, NutritionFields):
-    id = Column(Integer, primary_key=True)
+    __tablename__ = 'ingredient'
 
-
-class RecipeIngredient(db.Model):
-    """
-    """
     id = Column(Integer, primary_key=True)
-    ingredient = ForeignKey('Ingredient.id')
-    recipe_id = ForeignKey('Recipe.id', name='recipe_id')
-    amount = Float()
+    recipe_ingredients = db.relationship('RecipeIngredient', backref='ingredient')
+
 
 
 class Recipe(db.Model):
     """
-
+    TODO: Add table for recipe instructions.
     """
+    __tablename__ = 'recipe'
+
     id = Column(Integer, primary_key=True)
-    # ingredients = db.relationship('Ingredient', secondary=RecipeIngredient, backref='recipes')
-    recipe_ingredients = db.relationship('RecipeIngredient', backref='recipe_id')
+    recipe_ingredients = db.relationship('RecipeIngredient', backref='recipe')
 
     @property
     def nutrition_summary(self):
         summary = defaultdict(int)
-        print(self.__dict__)
-        print(self.recipe_ingredients)
-        for ingredient in self.ingredients:
+        for recipe_ingredient in self.recipe_ingredients:
+            ingredient = recipe_ingredient.ingredient
             for key in ingredient.nutrition_summary:
                 summary[key] += ingredient.nutrition_summary[key]
         return summary
 
 
-class Dish(db.Model, NutritionFields):
+class RecipeIngredient(db.Model):
     """
-    A dish that comes prepared, where the exact ingredients are not known.
+    Join table to associates recipes and ingredients.
+
+    TODO: Add field to include units with the amount.
     """
+    __tablename__ = 'recipe_ingredient'
+
     id = Column(Integer, primary_key=True)
-
-
-class Meal(db.Model):
-    """
-    A collection of recipes, dishes, and/or ingredients.
-    """
-    id = Column(Integer, primary_key=True)
-
-    @property
-    def nutrition_summary(self):
-        summary = defaultdict(int)
-        for related_model in ['dishes', 'ingredients', 'recipes']:
-            for related_object in getattr(self, related_model):
-                for key in related_object.nutrition_summary:
-                    summary[key] += related_object.nutrition_summary[key]
-        return summary
+    ingredient_id = Column(Integer, ForeignKey('ingredient.id'))
+    recipe_id = Column(Integer, ForeignKey('recipe.id'))
+    amount = Float()
