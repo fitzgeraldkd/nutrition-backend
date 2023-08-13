@@ -28,7 +28,7 @@ def setup_resources(app):
     db.init_app(app)
     with app.app_context():
         from api.model.user import User
-        from api.model.nutrition import Ingredient
+        from api.model.nutrition import Dish, Ingredient, Meal, MealDishes, MealIngredients, MealRecipes, Recipe, RecipeIngredient
         db.create_all()
 
 

@@ -1,9 +1,39 @@
 from bcrypt import gensalt, hashpw
-from factory import Faker, LazyAttribute, Sequence
+from factory import Faker, LazyAttribute, Sequence, SubFactory
 from factory.alchemy import SQLAlchemyModelFactory
 
 from api.model import db
+from api.model.nutrition import Ingredient, Recipe, RecipeIngredient
 from api.model.user import User
+
+
+class IngredientFactory(SQLAlchemyModelFactory):
+
+    class Meta:
+        model = Ingredient
+        sqlalchemy_session = db.session
+
+    id = Sequence(lambda n: n)
+
+
+class RecipeFactory(SQLAlchemyModelFactory):
+
+    class Meta:
+        model = Recipe
+        sqlalchemy_session = db.session
+
+    id = Sequence(lambda n: n)
+
+
+class RecipeIngredientFactory(SQLAlchemyModelFactory):
+
+    class Meta:
+        model = RecipeIngredient
+        sqlalchemy_session = db.session
+
+    id = Sequence(lambda n: n)
+    recipe = SubFactory(RecipeFactory)
+    ingredient = SubFactory(IngredientFactory)
 
 
 class UserFactory(SQLAlchemyModelFactory):
