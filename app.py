@@ -6,6 +6,7 @@ from flask_cors import CORS
 from flask_restful import Api
 
 from api.model import db
+from api.route.nutrition import RecipeAPI
 from api.route.user import AuthAPI, UserAPI
 
 
@@ -23,6 +24,7 @@ def create_app():
 def setup_resources(app):
     api = Api(app)
     api.add_resource(AuthAPI, "/api/v1.0/auth")
+    api.add_resource(RecipeAPI, "/api/v1.0/recipes", "/api/v1.0/recipes/<recipe_id>")
     api.add_resource(UserAPI, "/api/v1.0/users")
 
     CORS(app, resources={r"/api/*": {"origins": "*"}})
