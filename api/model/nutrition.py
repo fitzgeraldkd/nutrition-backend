@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from sqlalchemy import Column, Float, ForeignKey, Integer
+from sqlalchemy import Column, Float, ForeignKey, Integer, String
 
 from api.model import db
 
@@ -27,14 +27,23 @@ class Ingredient(db.Model, NutritionFields):
     recipe_ingredients = db.relationship('RecipeIngredient', backref='ingredient')
 
 
+class Instruction(db.Model):
+    """
+    A step to prepare a recipe.
+    """
+    __tablename__ = 'instruction'
+
+    id = Column(Integer, primary_key=True)
+    index = Column(Integer)
+    recipe_id = Column(Integer, ForeignKey('recipe.id'))
+    text = Column(String)
+
 
 class Recipe(db.Model):
-    """
-    TODO: Add table for recipe instructions.
-    """
     __tablename__ = 'recipe'
 
     id = Column(Integer, primary_key=True)
+    instructions = db.relationship('Instruction', backref='recipe')
     recipe_ingredients = db.relationship('RecipeIngredient', backref='recipe')
 
     @property
