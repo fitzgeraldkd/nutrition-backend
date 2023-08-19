@@ -11,40 +11,43 @@ class NutritionFields:
 
     TODO: Add serving size measurement and other relevant nutritional fields.
     """
+
     calories = Column(Integer)
     serving_size = Column(Integer)
 
     @property
     def nutrition_summary(self):
         return {
-            'calories': self.calories,
+            "calories": self.calories,
         }
 
+
 class Ingredient(db.Model, NutritionFields):
-    __tablename__ = 'ingredient'
+    __tablename__ = "ingredient"
 
     id = Column(Integer, primary_key=True)
-    recipe_ingredients = db.relationship('RecipeIngredient', backref='ingredient')
+    recipe_ingredients = db.relationship("RecipeIngredient", backref="ingredient")
 
 
 class Instruction(db.Model):
     """
     A step to prepare a recipe.
     """
-    __tablename__ = 'instruction'
+
+    __tablename__ = "instruction"
 
     id = Column(Integer, primary_key=True)
     index = Column(Integer)
-    recipe_id = Column(Integer, ForeignKey('recipe.id'))
+    recipe_id = Column(Integer, ForeignKey("recipe.id"))
     text = Column(String)
 
 
 class Recipe(db.Model):
-    __tablename__ = 'recipe'
+    __tablename__ = "recipe"
 
     id = Column(Integer, primary_key=True)
-    instructions = db.relationship('Instruction', backref='recipe')
-    recipe_ingredients = db.relationship('RecipeIngredient', backref='recipe')
+    instructions = db.relationship("Instruction", backref="recipe")
+    recipe_ingredients = db.relationship("RecipeIngredient", backref="recipe")
 
     @property
     def nutrition_summary(self):
@@ -62,9 +65,10 @@ class RecipeIngredient(db.Model):
 
     TODO: Add field to include units with the amount.
     """
-    __tablename__ = 'recipe_ingredient'
+
+    __tablename__ = "recipe_ingredient"
 
     id = Column(Integer, primary_key=True)
-    ingredient_id = Column(Integer, ForeignKey('ingredient.id'))
-    recipe_id = Column(Integer, ForeignKey('recipe.id'))
+    ingredient_id = Column(Integer, ForeignKey("ingredient.id"))
+    recipe_id = Column(Integer, ForeignKey("recipe.id"))
     amount = Float()

@@ -8,7 +8,6 @@ from api.model.user import User
 
 
 class IngredientFactory(SQLAlchemyModelFactory):
-
     class Meta:
         model = Ingredient
         sqlalchemy_session = db.session
@@ -17,7 +16,6 @@ class IngredientFactory(SQLAlchemyModelFactory):
 
 
 class RecipeFactory(SQLAlchemyModelFactory):
-
     class Meta:
         model = Recipe
         sqlalchemy_session = db.session
@@ -26,7 +24,6 @@ class RecipeFactory(SQLAlchemyModelFactory):
 
 
 class RecipeIngredientFactory(SQLAlchemyModelFactory):
-
     class Meta:
         model = RecipeIngredient
         sqlalchemy_session = db.session
@@ -37,14 +34,13 @@ class RecipeIngredientFactory(SQLAlchemyModelFactory):
 
 
 class UserFactory(SQLAlchemyModelFactory):
-
     class Meta:
         model = User
         sqlalchemy_session = db.session
 
     class Params:
-        raw_password = Faker('password')
+        raw_password = Faker("password")
 
     id = Sequence(lambda n: n)
-    email = Faker('email')
-    password = LazyAttribute(lambda o: hashpw(o.raw_password.encode('utf8'), gensalt()))
+    email = Faker("email")
+    password = LazyAttribute(lambda o: hashpw(o.raw_password.encode("utf8"), gensalt()))

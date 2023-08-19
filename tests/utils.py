@@ -9,14 +9,13 @@ from app import setup_resources
 
 
 class ApiTestCase(TestCase):
-
     def setUp(self):
-        load_dotenv('.env.testing')
+        load_dotenv(".env.testing")
         self.app = Flask(__name__)
         self.app.testing = True
-        self.app.secret_key = os.getenv('secret_key')
-        self.app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
-        self.app.config['TESTING'] = True
+        self.app.secret_key = os.getenv("secret_key")
+        self.app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite://"
+        self.app.config["TESTING"] = True
         self.app_context = self.app.app_context()
         self.app_context.push()
         setup_resources(self.app)
