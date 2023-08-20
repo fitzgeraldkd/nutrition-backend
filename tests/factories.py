@@ -3,7 +3,7 @@ from factory import Faker, LazyAttribute, Sequence, SubFactory
 from factory.alchemy import SQLAlchemyModelFactory
 
 from api.model import db
-from api.model.nutrition import Ingredient, Recipe, RecipeIngredient
+from api.model.nutrition import Ingredient, Instruction, Recipe, RecipeIngredient
 from api.model.user import User
 
 
@@ -21,6 +21,18 @@ class RecipeFactory(SQLAlchemyModelFactory):
         sqlalchemy_session = db.session
 
     id = Sequence(lambda n: n)
+    name = Faker("text")
+
+
+class InstructionFactory(SQLAlchemyModelFactory):
+    class Meta:
+        model = Instruction
+        sqlalchemy_session = db.session
+
+    id = Sequence(lambda n: n)
+    index = Sequence(lambda n: n)
+    recipe = SubFactory(RecipeFactory)
+    text = Faker("text")
 
 
 class RecipeIngredientFactory(SQLAlchemyModelFactory):

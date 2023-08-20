@@ -39,7 +39,7 @@ class Instruction(db.Model):
     id = Column(Integer, primary_key=True)
     index = Column(Integer)
     recipe_id = Column(Integer, ForeignKey("recipe.id"))
-    text = Column(String)
+    text = Column(String, nullable=False)
 
 
 class Recipe(db.Model):
@@ -47,6 +47,7 @@ class Recipe(db.Model):
 
     id = Column(Integer, primary_key=True)
     instructions = db.relationship("Instruction", backref="recipe")
+    name = Column(String, nullable=False)
     recipe_ingredients = db.relationship("RecipeIngredient", backref="recipe")
 
     @property
