@@ -11,8 +11,11 @@ class RecipeTests(ApiTestCase):
         response = self.client.delete(f"/api/v1.0/recipes/{recipe_id}")
         self.assertEqual(response.status_code, 204)
 
-        recipe = Recipe.query.filter_by(id=recipe_id).first()
+        recipe = Recipe.query.filter_by(id=recipe_id).one_or_none()
         self.assertIsNone(recipe)
+
+        response = self.client.delete(f"/api/v1.0/recipes/{recipe_id}")
+        self.assertEqual(response.status_code, 404)
 
     def test_get(self):
         response = self.client.get("/api/v1.0/recipes/-1")
@@ -71,6 +74,5 @@ class RecipeTests(ApiTestCase):
         )
         self.assertEqual(response.status_code, 201)
 
-        recipe = Recipe.query.filter_by(id=response.json["id"]).first()
-        self.assertIsNotNone(recipe)
+        recipe = Recipe.query.filter_by(id=response.json["id"]).one()
         self.assertDictEqual(response.json, RecipeSerializer().serialize(recipe))

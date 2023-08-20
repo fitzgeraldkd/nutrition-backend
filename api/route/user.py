@@ -37,7 +37,7 @@ class AuthAPI(Resource):
         if user_id is None:
             return {}, 400
 
-        user = User.query.filter(User.id == user_id).first()
+        user = User.query.filter_by(id=user_id).one_or_none()
         if user is None:
             session.clear()
             return {}, 400
@@ -52,7 +52,9 @@ class AuthAPI(Resource):
         payload = request.get_json()
         email = payload.get("email")
         password = payload.get("password")
-        user = User.query.filter(func.lower(User.email) == func.lower(email)).first()
+        user = User.query.filter(
+            func.lower(User.email) == func.lower(email)
+        ).one_or_none()
 
         if user is None:
             return {"error": "Invalid login credentials."}, 400

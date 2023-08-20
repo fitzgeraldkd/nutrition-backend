@@ -12,10 +12,7 @@ class SerializedResource(Resource):
     serializer = Serializer()
 
     def delete(self, **kwargs) -> Tuple[dict, int]:
-        instance = self.model.query.filter_by(**kwargs).first()
-        if instance is None:
-            return {}, 404
-
+        instance = self.model.query.filter_by(**kwargs).one_or_404()
         db.session.delete(instance)
         db.session.commit()
         return None, 204
@@ -24,10 +21,7 @@ class SerializedResource(Resource):
         if "id" not in kwargs:
             return self.list()
 
-        instance = self.model.query.filter_by(**kwargs).first()
-        if instance is None:
-            return {}, 404
-
+        instance = self.model.query.filter_by(**kwargs).one_or_404()
         return self.serializer.serialize(instance), 200
 
     def list(self) -> Tuple[List[dict], int]:
@@ -40,10 +34,7 @@ class SerializedResource(Resource):
         if errors:
             return errors, 400
 
-        instance = self.model.query.filter_by(**kwargs).first()
-        if instance is None:
-            return {}, 404
-
+        instance = self.model.query.filter_by(**kwargs).one_or_404()
         for key, value in payload.items():
             setattr(instance, key, value)
 

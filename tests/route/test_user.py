@@ -6,8 +6,7 @@ from tests.utils import ApiTestCase
 
 class UserTests(ApiTestCase):
     def test_post_with_valid_data(self):
-        user = User.query.filter(User.email == "kenny@kdfitz.com").first()
-        self.assertIsNone(user)
+        self.assertIsNone(User.query.filter(User.email == "kenny@kdfitz.com").first())
 
         response = self.client.post(
             "/api/v1.0/users",
@@ -15,7 +14,7 @@ class UserTests(ApiTestCase):
         )
         self.assertEqual(response.status_code, 200)
 
-        user = User.query.filter(User.email == "kenny@kdfitz.com").first()
+        user = User.query.filter(User.email == "kenny@kdfitz.com").one()
         self.assertIsNotNone(user)
 
     def test_post_with_invalid_data(self):
