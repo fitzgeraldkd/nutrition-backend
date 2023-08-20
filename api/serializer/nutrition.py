@@ -16,6 +16,10 @@ class InstructionSerializer(Serializer):
 
 
 class RecipeSerializer(Serializer):
+    validation_fields = {
+        "name": {"type": str, "required": True},
+    }
+
     def serialize(self, instance: Recipe):
         return {
             "id": instance.id,
