@@ -6,8 +6,8 @@ from tests.utils import ApiTestCase
 class RecipeSerializerTests(ApiTestCase):
     def test_serialize(self):
         recipe = RecipeFactory(name="Butter Chicken")
-        InstructionFactory(index=2, recipe=recipe, text="Cook onions.")
-        InstructionFactory(index=1, recipe=recipe, text="Melt butter.")
+        instruction_2 = InstructionFactory(index=2, recipe=recipe, text="Cook onions.")
+        instruction_1 = InstructionFactory(index=1, recipe=recipe, text="Melt butter.")
         data = RecipeSerializer().serialize(recipe)
         self.assertDictEqual(
             data,
@@ -15,8 +15,8 @@ class RecipeSerializerTests(ApiTestCase):
                 "id": recipe.id,
                 "name": "Butter Chicken",
                 "instructions": [
-                    {"index": 1, "text": "Melt butter."},
-                    {"index": 2, "text": "Cook onions."},
+                    {"id": instruction_1.id, "index": 1, "text": "Melt butter."},
+                    {"id": instruction_2.id, "index": 2, "text": "Cook onions."},
                 ],
             },
         )

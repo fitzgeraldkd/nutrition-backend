@@ -8,8 +8,15 @@ if TYPE_CHECKING:
 
 
 class InstructionSerializer(Serializer):
+    validation_fields = {
+        "index": {"type": int, "required": True},
+        "recipe_id": {"type": int, "required": True},
+        "text": {"type": str, "required": True},
+    }
+
     def serialize(self, instance: Instruction):
         return {
+            "id": instance.id,
             "index": instance.index,
             "text": instance.text,
         }

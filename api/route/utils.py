@@ -10,18 +10,21 @@ from api.serializer.utils import Serializer
 class SerializedResource(Resource):
     model = None
     serializer = Serializer()
+    pk_param = "id"
 
     def delete(self, **kwargs) -> Tuple[dict, int]:
-        instance = self.model.query.filter_by(**kwargs).one_or_404()
+        id = kwargs.pop(self.pk_param)
+        instance = self.model.query.filter_by(id=id, **kwargs).one_or_404()
         db.session.delete(instance)
         db.session.commit()
         return None, 204
 
     def get(self, **kwargs) -> Tuple[Union[dict, List[dict]], int]:
-        if "id" not in kwargs:
+        id = kwargs.pop(self.pk_param, None)
+        if id is None:
             return self.list()
 
-        instance = self.model.query.filter_by(**kwargs).one_or_404()
+        instance = self.model.query.filter_by(id=id, **kwargs).one_or_404()
         return self.serializer.serialize(instance), 200
 
     def list(self) -> Tuple[List[dict], int]:
@@ -29,12 +32,13 @@ class SerializedResource(Resource):
         return self.serializer.serialize_many(instances), 200
 
     def patch(self, **kwargs) -> Tuple[dict, int]:
+        id = kwargs.pop(self.pk_param)
         payload = request.get_json()
         errors = self.serializer.validate(payload, patch=True)
         if errors:
             return errors, 400
 
-        instance = self.model.query.filter_by(**kwargs).one_or_404()
+        instance = self.model.query.filter_by(id=id, **kwargs).one_or_404()
         for key, value in payload.items():
             setattr(instance, key, value)
 
