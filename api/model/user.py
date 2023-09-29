@@ -1,7 +1,7 @@
 from bcrypt import checkpw
 from sqlalchemy import Column, Integer, String, Text
 
-from api.model import db
+from api import db
 
 
 class User(db.Model):

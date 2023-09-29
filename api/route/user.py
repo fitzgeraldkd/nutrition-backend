@@ -3,7 +3,7 @@ from flask import request, session
 from flask_restful import Resource
 from sqlalchemy import func
 
-from api.model import db
+from api import db
 from api.model.user import User
 
 

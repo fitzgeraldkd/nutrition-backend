@@ -2,7 +2,7 @@ from collections import defaultdict
 
 from sqlalchemy import Column, Float, ForeignKey, Integer, String
 
-from api.model import db
+from api import db
 
 
 class NutritionFields:

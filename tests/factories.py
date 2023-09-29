@@ -2,7 +2,7 @@ from bcrypt import gensalt, hashpw
 from factory import Faker, LazyAttribute, Sequence, SubFactory
 from factory.alchemy import SQLAlchemyModelFactory
 
-from api.model import db
+from api import db
 from api.model.nutrition import Ingredient, Instruction, Recipe, RecipeIngredient
 from api.model.user import User
 

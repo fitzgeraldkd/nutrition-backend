@@ -1,4 +1,4 @@
-from api.model import db
+from api import db
 
 
 def create_join_table(join_table_name: str, table_name_1: str, table_name_2: str):

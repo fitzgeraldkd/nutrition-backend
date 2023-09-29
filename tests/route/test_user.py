@@ -1,4 +1,3 @@
-from api.model import db
 from api.model.user import User
 from tests.factories import UserFactory
 from tests.utils import ApiTestCase
