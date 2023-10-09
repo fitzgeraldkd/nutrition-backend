@@ -55,4 +55,6 @@ class UserFactory(SQLAlchemyModelFactory):
 
     id = Sequence(lambda n: n)
     email = Faker("email")
-    password = LazyAttribute(lambda o: hashpw(o.raw_password.encode("utf8"), gensalt()))
+    password = LazyAttribute(
+        lambda o: hashpw(o.raw_password.encode("utf-8"), gensalt()).decode("utf-8")
+    )

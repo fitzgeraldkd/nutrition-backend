@@ -69,7 +69,6 @@ class InstructionTests(ApiTestCase):
         response = self.client.patch(
             f"/api/v1.0/instructions/{instruction.id}", json={"text": "Dice onions."}
         )
-        print(response.json)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(instruction.text, "Dice onions.")
         self.assertDictEqual(

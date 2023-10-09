@@ -7,7 +7,7 @@ from app import setup_resources
 
 class ApiTestCase(TestCase):
     def create_app(self):
-        load_dotenv(".env.testing")
+        load_dotenv(".env.testing", override=True)
         self.app = create_app()
         self.app.testing = True
         self.app.config["TESTING"] = True

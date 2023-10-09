@@ -100,7 +100,7 @@ class AuthTests(ApiTestCase):
 
         # An invalid user id is cleared from the session.
         with self.client.session_transaction() as session:
-            session["user_id"] = "invalid"
+            session["user_id"] = -1
         response = self.client.get("/api/v1.0/auth")
         self.assertEqual(response.status_code, 400)
         self.assertDictEqual(response.json, {})

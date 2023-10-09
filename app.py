@@ -22,11 +22,11 @@ def setup_resources(app):
     CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 
+load_dotenv(".env")
 app = create_app()
 setup_resources(app)
 db.init_app(app)
 migrate = Migrate(app, db)
 
 if __name__ == "__main__":
-    load_dotenv(".env")
     app.run()

@@ -10,4 +10,4 @@ class User(db.Model):
     password = Column(Text, nullable=False)
 
     def verify_password(self, password: str):
-        return checkpw(password.encode("utf8"), self.password)
+        return checkpw(password.encode("utf-8"), self.password.encode("utf-8"))

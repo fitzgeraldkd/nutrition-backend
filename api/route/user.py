@@ -24,7 +24,10 @@ class UserAPI(Resource):
         if existing_user:
             return {"error": "An account with this email address already exists."}, 400
 
-        user = User(email=email, password=hashpw(password.encode("utf8"), gensalt()))
+        user = User(
+            email=email,
+            password=hashpw(password.encode("utf-8"), gensalt()).decode("utf-8"),
+        )
         db.session.add(user)
         db.session.commit()
         return {}, 200
