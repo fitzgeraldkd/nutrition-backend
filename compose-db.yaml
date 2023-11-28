@@ -1,0 +1,17 @@
+services:
+  db:
+    image: postgres
+    restart: always
+    user: ${db_username}
+    environment:
+      - POSTGRES_DB=${db_database}
+      - POSTGRES_PASSWORD=${db_password}
+    expose:
+      - ${db_port}
+    ports:
+      - ${db_port}:5432
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5

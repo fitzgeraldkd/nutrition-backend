@@ -1,0 +1,7 @@
+services:
+  db_test:
+    container_name: nutrition-test-db
+    env_file: ./.env.testing
+    extends:
+      file: compose-db.yaml
+      service: db

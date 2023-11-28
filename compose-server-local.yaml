@@ -1,0 +1,7 @@
+services:
+  server_local:
+    container_name: nutrition-local-server
+    env_file: ./.env.local
+    extends:
+      file: compose-server.yaml
+      service: server
