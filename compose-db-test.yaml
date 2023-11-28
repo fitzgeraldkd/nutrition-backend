@@ -5,3 +5,7 @@ services:
     extends:
       file: compose-db.yaml
       service: db
+    volumes:
+      - db-test-data:/var/lib/postgresql/data
+volumes:
+  db-test-data:
