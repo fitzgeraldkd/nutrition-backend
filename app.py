@@ -1,4 +1,3 @@
-from dotenv import load_dotenv
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_restful import Api
@@ -22,7 +21,6 @@ def setup_resources(app):
     CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 
-load_dotenv(".env")
 app = create_app()
 setup_resources(app)
 db.init_app(app)
