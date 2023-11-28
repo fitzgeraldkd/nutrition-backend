@@ -46,7 +46,4 @@ COPY . .
 EXPOSE 5000
 
 # Run the application.
-# CMD python -m flask run --debug
-CMD python -m flask db upgrade
 CMD python app.py
-# CMD python foo.py

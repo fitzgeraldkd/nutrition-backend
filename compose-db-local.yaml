@@ -1,7 +1,7 @@
 services:
   db_local:
     container_name: nutrition-local-db
-    env_file: ./.env
+    env_file: ./.env.local
     extends:
       file: compose-db.yaml
       service: db
