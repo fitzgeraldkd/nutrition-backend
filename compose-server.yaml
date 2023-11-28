@@ -3,7 +3,7 @@ services:
     build:
       context: .
     ports:
-      - 5000:5000
+      - ${server_port}:${server_port}
     develop:
       watch:
         - action: rebuild

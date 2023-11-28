@@ -1,3 +1,5 @@
+import os
+
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_restful import Api
@@ -27,4 +29,4 @@ db.init_app(app)
 migrate = Migrate(app, db)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0")
+    app.run(host="0.0.0.0", port=int(os.environ["server_port"]))
