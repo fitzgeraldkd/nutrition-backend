@@ -5,3 +5,5 @@ services:
     extends:
       file: compose-server.yaml
       service: server
+    volumes:
+      - ./migrations/versions/:/app/migrations/versions/
