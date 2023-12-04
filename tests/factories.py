@@ -1,33 +1,37 @@
 from bcrypt import gensalt, hashpw
 from factory import Faker, LazyAttribute, Sequence, SubFactory
-from factory.alchemy import SQLAlchemyModelFactory
+from factory.alchemy import SESSION_PERSISTENCE_FLUSH, SQLAlchemyModelFactory
 
 from api import db
 from api.model.nutrition import Ingredient, Instruction, Recipe, RecipeIngredient
 from api.model.user import User
 
 
-class IngredientFactory(SQLAlchemyModelFactory):
+class BaseFactory(SQLAlchemyModelFactory):
+    class Meta:
+        sqlalchemy_session = db.session
+        sqlalchemy_session_persistence = SESSION_PERSISTENCE_FLUSH
+
+
+class IngredientFactory(BaseFactory):
     class Meta:
         model = Ingredient
-        sqlalchemy_session = db.session
-
-    id = Sequence(lambda n: n)
-
-
-class RecipeFactory(SQLAlchemyModelFactory):
-    class Meta:
-        model = Recipe
-        sqlalchemy_session = db.session
 
     id = Sequence(lambda n: n)
     name = Faker("text")
 
 
-class InstructionFactory(SQLAlchemyModelFactory):
+class RecipeFactory(BaseFactory):
+    class Meta:
+        model = Recipe
+
+    id = Sequence(lambda n: n)
+    name = Faker("text")
+
+
+class InstructionFactory(BaseFactory):
     class Meta:
         model = Instruction
-        sqlalchemy_session = db.session
 
     id = Sequence(lambda n: n)
     index = Sequence(lambda n: n)
@@ -35,20 +39,18 @@ class InstructionFactory(SQLAlchemyModelFactory):
     text = Faker("text")
 
 
-class RecipeIngredientFactory(SQLAlchemyModelFactory):
+class RecipeIngredientFactory(BaseFactory):
     class Meta:
         model = RecipeIngredient
-        sqlalchemy_session = db.session
 
     id = Sequence(lambda n: n)
     recipe = SubFactory(RecipeFactory)
     ingredient = SubFactory(IngredientFactory)
 
 
-class UserFactory(SQLAlchemyModelFactory):
+class UserFactory(BaseFactory):
     class Meta:
         model = User
-        sqlalchemy_session = db.session
 
     class Params:
         raw_password = Faker("password")

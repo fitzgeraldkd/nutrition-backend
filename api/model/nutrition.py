@@ -8,15 +8,17 @@ from api import db
 class NutritionFields:
     """
     Common fields for tables that store nutrition information.
-
-    TODO: Add serving size measurement and other relevant nutritional fields.
     """
 
     calories = Column(Integer)
-    serving_size = Column(Integer)
+    serving_size = Column(Float)
+    serving_unit_text = Column(String)
 
     @property
     def nutrition_summary(self):
+        """
+        A per-serving summary of the nutritional information.
+        """
         return {
             "calories": self.calories,
         }
@@ -26,6 +28,8 @@ class Ingredient(db.Model, NutritionFields):
     __tablename__ = "ingredient"
 
     id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    brand = Column(String)
     recipe_ingredients = db.relationship("RecipeIngredient", backref="ingredient")
 
 
@@ -37,8 +41,8 @@ class Instruction(db.Model):
     __tablename__ = "instruction"
 
     id = Column(Integer, primary_key=True)
-    index = Column(Integer)
-    recipe_id = Column(Integer, ForeignKey("recipe.id"))
+    index = Column(Integer, nullable=False)
+    recipe_id = Column(Integer, ForeignKey("recipe.id"), nullable=False)
     text = Column(String, nullable=False)
 
 
@@ -49,9 +53,11 @@ class Recipe(db.Model):
     instructions = db.relationship("Instruction", backref="recipe")
     name = Column(String, nullable=False)
     recipe_ingredients = db.relationship("RecipeIngredient", backref="recipe")
+    source = Column(String)
 
     @property
     def nutrition_summary(self):
+        # TODO: The actual amount used in the recipe needs to be considered.
         summary = defaultdict(int)
         for recipe_ingredient in self.recipe_ingredients:
             ingredient = recipe_ingredient.ingredient
@@ -63,13 +69,12 @@ class Recipe(db.Model):
 class RecipeIngredient(db.Model):
     """
     Join table to associates recipes and ingredients.
-
-    TODO: Add field to include units with the amount.
     """
 
     __tablename__ = "recipe_ingredient"
 
     id = Column(Integer, primary_key=True)
-    ingredient_id = Column(Integer, ForeignKey("ingredient.id"))
-    recipe_id = Column(Integer, ForeignKey("recipe.id"))
-    amount = Float()
+    ingredient_id = Column(Integer, ForeignKey("ingredient.id"), nullable=False)
+    recipe_id = Column(Integer, ForeignKey("recipe.id"), nullable=False)
+    amount = Column(Float)
+    amount_unit_text = Column(String)
