@@ -1,6 +1,6 @@
 from flask_testing import TestCase
 
-from api import create_app, db
+from api import create_app, db, login_manager
 from app import setup_resources
 
 
@@ -11,6 +11,7 @@ class ApiTestCase(TestCase):
         self.app.config["TESTING"] = True
         self.client = self.app.test_client()
         db.init_app(self.app)
+        login_manager.init_app(self.app)
         setup_resources(self.app)
 
         return self.app

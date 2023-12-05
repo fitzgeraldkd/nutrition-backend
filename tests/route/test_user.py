@@ -1,3 +1,5 @@
+from flask_login import current_user
+
 from api.model.user import User
 from tests.factories import UserFactory
 from tests.utils import ApiTestCase
@@ -78,8 +80,7 @@ class AuthTests(ApiTestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertDictEqual(response.json, {})
-        with self.client.session_transaction() as session:
-            self.assertEqual(session["user_id"], 1)
+        self.assertEqual(current_user.id, 1)
 
         # A user can fetch their own info when logged in.
         response = self.client.get("/api/v1.0/auth")
@@ -90,22 +91,12 @@ class AuthTests(ApiTestCase):
         response = self.client.delete("/api/v1.0/auth")
         self.assertEqual(response.status_code, 200)
         self.assertDictEqual(response.json, {})
-        with self.client.session_transaction() as session:
-            self.assertCountEqual(session.keys(), [])
+        self.assertFalse(current_user.is_authenticated)
 
         # An anonymous user cannot fetch auth info.
         response = self.client.get("/api/v1.0/auth")
         self.assertEqual(response.status_code, 400)
         self.assertDictEqual(response.json, {})
-
-        # An invalid user id is cleared from the session.
-        with self.client.session_transaction() as session:
-            session["user_id"] = -1
-        response = self.client.get("/api/v1.0/auth")
-        self.assertEqual(response.status_code, 400)
-        self.assertDictEqual(response.json, {})
-        with self.client.session_transaction() as session:
-            self.assertCountEqual(session.keys(), [])
 
         # The email field is case-insensitive.
         response = self.client.post(
@@ -117,5 +108,4 @@ class AuthTests(ApiTestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertDictEqual(response.json, {})
-        with self.client.session_transaction() as session:
-            self.assertEqual(session["user_id"], 1)
+        self.assertEqual(current_user.id, 1)

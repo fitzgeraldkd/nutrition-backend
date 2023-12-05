@@ -1,5 +1,6 @@
 from bcrypt import gensalt, hashpw
-from flask import request, session
+from flask import request
+from flask_login import current_user, login_user, logout_user
 from flask_restful import Resource
 from sqlalchemy import func
 
@@ -35,20 +36,13 @@ class UserAPI(Resource):
 
 class AuthAPI(Resource):
     def get(self):
-        user_id = session.get("user_id")
-
-        if user_id is None:
+        if not current_user.is_authenticated:
             return {}, 400
 
-        user = User.query.filter_by(id=user_id).one_or_none()
-        if user is None:
-            session.clear()
-            return {}, 400
-
-        return {"user": user.id}
+        return {"user": current_user.id}
 
     def delete(self):
-        session.clear()
+        logout_user()
         return {}
 
     def post(self):
@@ -63,8 +57,7 @@ class AuthAPI(Resource):
             return {"error": "Invalid login credentials."}, 400
 
         if user.verify_password(password):
-            session.clear()
-            session["user_id"] = user.id
+            login_user(user)
             return {}
         else:
             return {"error": "Invalid login credentials."}, 400

@@ -4,7 +4,7 @@ from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_restful import Api
 
-from api import create_app, db
+from api import create_app, db, login_manager
 from api.route.nutrition import InstructionAPI, RecipeAPI
 from api.route.user import AuthAPI, UserAPI
 
@@ -27,6 +27,7 @@ app = create_app()
 setup_resources(app)
 db.init_app(app)
 migrate = Migrate(app, db)
+login_manager.init_app(app)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ["server_port"]))
