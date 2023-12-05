@@ -1,6 +1,6 @@
 from api.model.nutrition import Instruction, Recipe
 from api.serializer.nutrition import InstructionSerializer, RecipeSerializer
-from tests.factories import InstructionFactory, RecipeFactory
+from tests.factories import InstructionFactory, RecipeFactory, UserFactory
 from tests.utils import ApiTestCase
 
 
@@ -159,6 +159,10 @@ class RecipeTests(ApiTestCase):
         self.assertDictEqual(response.json, RecipeSerializer().serialize(recipe))
 
     def test_post(self):
+        user = UserFactory()
+        with self.client.session_transaction() as session:
+            session['user_id'] = user.id
+
         response = self.client.post(
             "/api/v1.0/recipes", json={"name": "Butter Chicken"}
         )

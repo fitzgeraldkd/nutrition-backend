@@ -31,6 +31,7 @@ class Ingredient(db.Model, NutritionFields):
     name = Column(String, nullable=False)
     brand = Column(String)
     recipe_ingredients = db.relationship("RecipeIngredient", backref="ingredient")
+    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
 
 
 class Instruction(db.Model):
@@ -54,6 +55,7 @@ class Recipe(db.Model):
     name = Column(String, nullable=False)
     recipe_ingredients = db.relationship("RecipeIngredient", backref="recipe")
     source = Column(String)
+    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
 
     @property
     def nutrition_summary(self):

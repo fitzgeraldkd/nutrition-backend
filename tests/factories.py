@@ -13,12 +13,27 @@ class BaseFactory(SQLAlchemyModelFactory):
         sqlalchemy_session_persistence = SESSION_PERSISTENCE_FLUSH
 
 
+class UserFactory(BaseFactory):
+    class Meta:
+        model = User
+
+    class Params:
+        raw_password = Faker("password")
+
+    id = Sequence(lambda n: n)
+    email = Faker("email")
+    password = LazyAttribute(
+        lambda o: hashpw(o.raw_password.encode("utf-8"), gensalt()).decode("utf-8")
+    )
+
+
 class IngredientFactory(BaseFactory):
     class Meta:
         model = Ingredient
 
     id = Sequence(lambda n: n)
     name = Faker("text")
+    user = SubFactory(UserFactory)
 
 
 class RecipeFactory(BaseFactory):
@@ -27,6 +42,7 @@ class RecipeFactory(BaseFactory):
 
     id = Sequence(lambda n: n)
     name = Faker("text")
+    user = SubFactory(UserFactory)
 
 
 class InstructionFactory(BaseFactory):
@@ -46,17 +62,3 @@ class RecipeIngredientFactory(BaseFactory):
     id = Sequence(lambda n: n)
     recipe = SubFactory(RecipeFactory)
     ingredient = SubFactory(IngredientFactory)
-
-
-class UserFactory(BaseFactory):
-    class Meta:
-        model = User
-
-    class Params:
-        raw_password = Faker("password")
-
-    id = Sequence(lambda n: n)
-    email = Faker("email")
-    password = LazyAttribute(
-        lambda o: hashpw(o.raw_password.encode("utf-8"), gensalt()).decode("utf-8")
-    )

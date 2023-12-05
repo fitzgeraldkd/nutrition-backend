@@ -1,5 +1,7 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, Dict, List
+
+from flask import session
 
 from api.serializer.utils import Serializer
 
@@ -38,3 +40,14 @@ class RecipeSerializer(Serializer):
 
     def serialize_many(self, instances: List[Recipe]):
         return [{"id": instance.id, "name": instance.name} for instance in instances]
+
+    def validate(self, data: dict, patch=False, strict=True) -> Dict[str, List[str]]:
+        errors = super().validate(data, patch, strict)
+
+        if not patch and 'user_id' not in data:
+            if session.get('user_id') is None:
+                errors['user_id'] = 'You must be signed in.'
+            else:
+                data['user_id'] = session['user_id']
+
+        return errors
