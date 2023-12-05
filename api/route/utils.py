@@ -5,6 +5,7 @@ from flask_restful import Resource
 
 from api import db
 from api.serializer.utils import Serializer
+from api.utils.constants import HTTPMethod
 
 
 class SerializedResource(Resource):
@@ -34,7 +35,7 @@ class SerializedResource(Resource):
     def patch(self, **kwargs) -> Tuple[dict, int]:
         id = kwargs.pop(self.pk_param)
         payload = request.get_json()
-        errors = self.serializer.validate(payload, patch=True)
+        errors = self.serializer.validate(payload, HTTPMethod.PATCH)
         if errors:
             return errors, 400
 
@@ -46,7 +47,7 @@ class SerializedResource(Resource):
 
     def post(self) -> Tuple[dict, int]:
         payload = request.get_json()
-        errors = self.serializer.validate(payload)
+        errors = self.serializer.validate(payload, HTTPMethod.POST)
         if errors:
             return errors, 400
 

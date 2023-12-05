@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Dict, List
 from flask_login import current_user
 
 from api.serializer.utils import Serializer
+from api.utils.constants import HTTPMethod
 
 if TYPE_CHECKING:
     from api.model.nutrition import Instruction, Recipe
@@ -41,8 +42,10 @@ class RecipeSerializer(Serializer):
     def serialize_many(self, instances: List[Recipe]):
         return [{"id": instance.id, "name": instance.name} for instance in instances]
 
-    def validate(self, data: dict, patch=False, strict=True) -> Dict[str, List[str]]:
-        errors = super().validate(data, patch, strict)
-        data['user_id'] = current_user.id
+    def validate(self, data: dict, method: str, strict=True) -> Dict[str, List[str]]:
+        errors = super().validate(data, method, strict)
+
+        if method == HTTPMethod.POST:
+            data["user_id"] = current_user.id
 
         return errors

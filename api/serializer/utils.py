@@ -1,6 +1,8 @@
 from collections import defaultdict
 from typing import Dict, List, Optional, TypedDict
 
+from api.utils.constants import HTTPMethod
+
 
 class Validator(TypedDict):
     type: type
@@ -16,10 +18,10 @@ class Serializer:
     def serialize_many(self, instances) -> List[dict]:
         return [self.serialize(instance) for instance in instances]
 
-    def validate(self, data: dict, patch=False, strict=True) -> Dict[str, List[str]]:
+    def validate(self, data: dict, method: str, strict=True) -> Dict[str, List[str]]:
         errors = defaultdict(list)
 
-        if not patch:
+        if method == HTTPMethod.POST:
             for key in self.validation_fields:
                 if key not in data:
                     errors[key].append("This field is required.")
