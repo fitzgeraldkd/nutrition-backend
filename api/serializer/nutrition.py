@@ -7,7 +7,32 @@ from api.serializer.utils import Serializer
 from api.utils.constants import HTTPMethod
 
 if TYPE_CHECKING:
-    from api.model.nutrition import Instruction, Recipe
+    from api.model.nutrition import Ingredient, Instruction, Recipe
+
+
+class IngredientSerializer(Serializer):
+    validation_fields = {
+        "name": {"type": str, "required": True},
+    }
+
+    def serialize(self, instance: Ingredient):
+        return {
+            "id": instance.id,
+            "name": instance.name,
+            "brand": instance.brand,
+            "nutrition_summary": instance.nutrition_summary,
+        }
+
+    def serialize_many(self, instances) -> List[dict]:
+        return [{"id": instance.id, "name": instance.name} for instance in instances]
+
+    def validate(self, data: dict, method: str, strict=True) -> Dict[str, List[str]]:
+        errors = super().validate(data, method, strict)
+
+        if method == HTTPMethod.POST:
+            data["user_id"] = current_user.id
+
+        return errors
 
 
 class InstructionSerializer(Serializer):

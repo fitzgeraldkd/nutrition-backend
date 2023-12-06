@@ -1,8 +1,19 @@
 from flask_login import login_required
 
-from api.model.nutrition import Instruction, Recipe
+from api.model.nutrition import Ingredient, Instruction, Recipe
 from api.route.utils import SerializedResource
-from api.serializer.nutrition import InstructionSerializer, RecipeSerializer
+from api.serializer.nutrition import (
+    IngredientSerializer,
+    InstructionSerializer,
+    RecipeSerializer,
+)
+
+
+class IngredientAPI(SerializedResource):
+    decorators = [login_required]
+    model = Ingredient
+    serializer = IngredientSerializer()
+    pk_param = "ingredient_id"
 
 
 class InstructionAPI(SerializedResource):
