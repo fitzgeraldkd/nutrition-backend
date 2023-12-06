@@ -12,14 +12,13 @@ class InstructionTests(ApiTestCase):
     def test_delete(self):
         instruction = InstructionFactory()
         instruction_id = instruction.id
-        
+
         response = self.client.delete(f"{self.base_url}/{instruction_id}")
         self.assertEqual(response.status_code, 401)
 
-        # TODO: Add authorization logic.
-        # login_user(UserFactory())
-        # response = self.client.delete(f"{self.base_url}/{instruction_id}")
-        # self.assertEqual(response.status_code, 403)
+        login_user(UserFactory())
+        response = self.client.delete(f"{self.base_url}/{instruction_id}")
+        self.assertEqual(response.status_code, 403)
 
         login_user(instruction.recipe.user)
         response = self.client.delete(f"{self.base_url}/{instruction_id}")
@@ -35,7 +34,7 @@ class InstructionTests(ApiTestCase):
         InstructionFactory()
         instruction = InstructionFactory(index=1, text="Preheat oven.")
         InstructionFactory()
-        
+
         response = self.client.get(f"{self.base_url}/-1")
         self.assertEqual(response.status_code, 401)
 
@@ -43,9 +42,8 @@ class InstructionTests(ApiTestCase):
         response = self.client.get(f"{self.base_url}/-1")
         self.assertEqual(response.status_code, 404)
 
-        # TODO: Add authorization logic.
-        # response = self.client.get(f"{self.base_url}/{instruction.id}")
-        # self.assertEqual(response.status_code, 403)
+        response = self.client.get(f"{self.base_url}/{instruction.id}")
+        self.assertEqual(response.status_code, 403)
 
         login_user(instruction.recipe.user)
         response = self.client.get(f"{self.base_url}/{instruction.id}")
@@ -63,7 +61,7 @@ class InstructionTests(ApiTestCase):
         recipe = RecipeFactory()
         instruction_1 = InstructionFactory(index=1, recipe=recipe, text="Preheat oven.")
         instruction_2 = InstructionFactory(index=2, recipe=recipe, text="Dice onions.")
-        
+
         response = self.client.get("/api/v1.0/instructions")
         self.assertEqual(response.status_code, 401)
 
@@ -90,14 +88,15 @@ class InstructionTests(ApiTestCase):
 
         response = self.client.patch("/api/v1.0/instructions/-1", json=payload)
         self.assertEqual(response.status_code, 401)
-        
+
         login_user(UserFactory())
         response = self.client.patch("/api/v1.0/instructions/-1", json=payload)
         self.assertEqual(response.status_code, 404)
 
-        # TODO: Add authorization logic.
-        # response = self.client.patch(f"/api/v1.0/instructions/{instruction.id}", json=payload)
-        # self.assertEqual(response.status_code, 403)
+        response = self.client.patch(
+            f"/api/v1.0/instructions/{instruction.id}", json=payload
+        )
+        self.assertEqual(response.status_code, 403)
 
         login_user(instruction.recipe.user)
         response = self.client.patch(
@@ -120,13 +119,15 @@ class InstructionTests(ApiTestCase):
         response = self.client.post(self.base_url, json=payload)
         self.assertEqual(response.status_code, 400)
 
-        # TODO: Add authorization logic.
-        # login_user(recipe.user)
-        # response = self.client.post(self.base_url, json={"recipe_id": recipe.id, **payload})
-        # self.assertEqual(response.status_code, 403)
+        response = self.client.post(
+            self.base_url, json={"recipe_id": recipe.id, **payload}
+        )
+        self.assertEqual(response.status_code, 403)
 
         login_user(recipe.user)
-        response = self.client.post(self.base_url, json={"recipe_id": recipe.id, **payload})
+        response = self.client.post(
+            self.base_url, json={"recipe_id": recipe.id, **payload}
+        )
         self.assertEqual(response.status_code, 201)
 
         instruction = Instruction.query.filter_by(id=response.json["id"]).one()
@@ -145,10 +146,9 @@ class RecipeTests(ApiTestCase):
         response = self.client.delete(f"{self.base_url}/{recipe_id}")
         self.assertEqual(response.status_code, 401)
 
-        # TODO: Add authorization logic.
-        # login_user(UserFactory())
-        # response = self.client.delete(f"{self.base_url}/{recipe_id}")
-        # self.assertEqual(response.status_code, 403)
+        login_user(UserFactory())
+        response = self.client.delete(f"{self.base_url}/{recipe_id}")
+        self.assertEqual(response.status_code, 403)
 
         login_user(recipe.user)
         response = self.client.delete(f"{self.base_url}/{recipe_id}")
@@ -172,10 +172,10 @@ class RecipeTests(ApiTestCase):
         response = self.client.get(f"{self.base_url}/-1")
         self.assertEqual(response.status_code, 404)
 
-        # TODO: Add authorization logic.
-        # response = self.client.get(f"{self.base_url}/{recipe.id}")
-        # self.assertEqual(response.status_code, 403)
+        response = self.client.get(f"{self.base_url}/{recipe.id}")
+        self.assertEqual(response.status_code, 403)
 
+        login_user(recipe.user)
         response = self.client.get(f"{self.base_url}/{recipe.id}")
         self.assertEqual(response.status_code, 200)
         self.assertDictEqual(
@@ -225,9 +225,8 @@ class RecipeTests(ApiTestCase):
 
         recipe = RecipeFactory(name="Butter Chicken")
 
-        # TODO: Add authorization logic.
-        # response = self.client.patch(f"{self.base_url}/{recipe.id}", json=payload)
-        # self.assertEqual(response.status_code, 403)
+        response = self.client.patch(f"{self.base_url}/{recipe.id}", json=payload)
+        self.assertEqual(response.status_code, 403)
 
         login_user(recipe.user)
         response = self.client.patch(f"{self.base_url}/{recipe.id}", json=payload)

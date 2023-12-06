@@ -3,6 +3,7 @@ from collections import defaultdict
 from sqlalchemy import Column, Float, ForeignKey, Integer, String
 
 from api import db
+from api.model.utils import CommonFields
 
 
 class NutritionFields:
@@ -24,7 +25,7 @@ class NutritionFields:
         }
 
 
-class Ingredient(db.Model, NutritionFields):
+class Ingredient(db.Model, CommonFields, NutritionFields):
     __tablename__ = "ingredient"
 
     id = Column(Integer, primary_key=True)
@@ -33,8 +34,11 @@ class Ingredient(db.Model, NutritionFields):
     recipe_ingredients = db.relationship("RecipeIngredient", backref="ingredient")
     user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
 
+    def get_owner(self):
+        return self.user
 
-class Instruction(db.Model):
+
+class Instruction(db.Model, CommonFields):
     """
     A step to prepare a recipe.
     """
@@ -46,8 +50,11 @@ class Instruction(db.Model):
     recipe_id = Column(Integer, ForeignKey("recipe.id"), nullable=False)
     text = Column(String, nullable=False)
 
+    def get_owner(self):
+        return self.recipe.user
 
-class Recipe(db.Model):
+
+class Recipe(db.Model, CommonFields):
     __tablename__ = "recipe"
 
     id = Column(Integer, primary_key=True)
@@ -56,6 +63,9 @@ class Recipe(db.Model):
     recipe_ingredients = db.relationship("RecipeIngredient", backref="recipe")
     source = Column(String)
     user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+
+    def get_owner(self):
+        return self.user
 
     @property
     def nutrition_summary(self):
@@ -68,7 +78,7 @@ class Recipe(db.Model):
         return summary
 
 
-class RecipeIngredient(db.Model):
+class RecipeIngredient(db.Model, CommonFields):
     """
     Join table to associates recipes and ingredients.
     """
@@ -80,3 +90,6 @@ class RecipeIngredient(db.Model):
     recipe_id = Column(Integer, ForeignKey("recipe.id"), nullable=False)
     amount = Column(Float)
     amount_unit_text = Column(String)
+
+    def get_owner(self):
+        return self.recipe.user

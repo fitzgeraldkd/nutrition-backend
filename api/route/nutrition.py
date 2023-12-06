@@ -11,6 +11,10 @@ class InstructionAPI(SerializedResource):
     serializer = InstructionSerializer()
     pk_param = "instruction_id"
 
+    def _get_parent_owners(self, payload: dict):
+        recipe = Recipe.query.filter_by(id=payload["recipe_id"]).one_or_404()
+        return [recipe.get_owner()]
+
 
 class RecipeAPI(SerializedResource):
     decorators = [login_required]
