@@ -7,7 +7,7 @@ from api.serializer.utils import Serializer
 from api.utils.constants import HTTPMethod
 
 if TYPE_CHECKING:
-    from api.model.nutrition import Ingredient, Instruction, Recipe
+    from api.model.nutrition import Ingredient, Instruction, Recipe, RecipeIngredient
 
 
 class IngredientSerializer(Serializer):
@@ -74,3 +74,20 @@ class RecipeSerializer(Serializer):
             data["user_id"] = current_user.id
 
         return errors
+
+
+class RecipeIngredientSerializer(Serializer):
+    validation_fields = {
+        "amount": {"type": float, "required": False},
+        "amount_unit_text": {"type": str, "required": False},
+        "ingredient_id": {"type": int, "required": True},
+        "recipe_id": {"type": int, "required": True},
+    }
+
+    def serialize(self, instance: RecipeIngredient) -> dict:
+        return {
+            "id": instance.id,
+            "name": instance.ingredient.name,
+            "amount": instance.amount,
+            "amount_unit_text": instance.amount_unit_text,
+        }

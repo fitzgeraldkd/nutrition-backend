@@ -2,8 +2,14 @@ from api.serializer.nutrition import (
     IngredientSerializer,
     InstructionSerializer,
     RecipeSerializer,
+    RecipeIngredientSerializer,
 )
-from tests.factories import IngredientFactory, InstructionFactory, RecipeFactory
+from tests.factories import (
+    IngredientFactory,
+    InstructionFactory,
+    RecipeFactory,
+    RecipeIngredientFactory,
+)
 from tests.utils import ApiTestCase
 
 
@@ -85,5 +91,58 @@ class RecipeSerializerTests(ApiTestCase):
             [
                 {"id": recipe_1.id, "name": "Butter Chicken"},
                 {"id": recipe_2.id, "name": "Pad Thai"},
+            ],
+        )
+
+
+class RecipeIngredientSerializerTests(ApiTestCase):
+    def test_serialize(self):
+        recipe = RecipeFactory(name="French Toast")
+        ingredient = IngredientFactory(name="Egg")
+        recipe_ingredient = RecipeIngredientFactory(
+            recipe=recipe, ingredient=ingredient, amount=2
+        )
+
+        data = RecipeIngredientSerializer().serialize(recipe_ingredient)
+        self.assertDictEqual(
+            data,
+            {
+                "id": recipe_ingredient.id,
+                "name": "Egg",
+                "amount": 2,
+                "amount_unit_text": None,
+            },
+        )
+
+    def test_serialize_many(self):
+        recipe = RecipeFactory(name="French Toast")
+        ingredient_1 = IngredientFactory(name="Egg")
+        recipe_ingredient_1 = RecipeIngredientFactory(
+            recipe=recipe, ingredient=ingredient_1, amount=2
+        )
+
+        ingredient_2 = IngredientFactory(name="Bread")
+        recipe_ingredient_2 = RecipeIngredientFactory(
+            recipe=recipe, ingredient=ingredient_2, amount=4, amount_unit_text="slice"
+        )
+
+        data = RecipeIngredientSerializer().serialize_many(
+            [recipe_ingredient_1, recipe_ingredient_2]
+        )
+        self.assertListEqual(
+            data,
+            [
+                {
+                    "id": recipe_ingredient_1.id,
+                    "name": "Egg",
+                    "amount": 2,
+                    "amount_unit_text": None,
+                },
+                {
+                    "id": recipe_ingredient_2.id,
+                    "name": "Bread",
+                    "amount": 4,
+                    "amount_unit_text": "slice",
+                },
             ],
         )
