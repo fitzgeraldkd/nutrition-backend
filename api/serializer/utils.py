@@ -1,11 +1,11 @@
 from collections import defaultdict
-from typing import Dict, List, Optional, TypedDict
+from typing import Dict, List, Optional, Tuple, TypedDict, Union
 
 from api.utils.constants import HTTPMethod
 
 
 class Validator(TypedDict):
-    type: type
+    type: Union[type, Tuple[type, ...]]
     required: Optional[bool]
 
 
@@ -22,8 +22,8 @@ class Serializer:
         errors = defaultdict(list)
 
         if method == HTTPMethod.POST:
-            for key in self.validation_fields:
-                if key not in data:
+            for key, validation in self.validation_fields.items():
+                if validation["required"] and key not in data:
                     errors[key].append("This field is required.")
 
         for key, value in data.items():

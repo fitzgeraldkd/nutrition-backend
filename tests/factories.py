@@ -1,5 +1,5 @@
 from bcrypt import gensalt, hashpw
-from factory import Faker, LazyAttribute, Sequence, SubFactory
+from factory import Faker, LazyAttribute, SelfAttribute, Sequence, SubFactory
 from factory.alchemy import SESSION_PERSISTENCE_FLUSH, SQLAlchemyModelFactory
 
 from api import db
@@ -60,5 +60,10 @@ class RecipeIngredientFactory(BaseFactory):
         model = RecipeIngredient
 
     id = Sequence(lambda n: n)
-    recipe = SubFactory(RecipeFactory)
-    ingredient = SubFactory(IngredientFactory)
+    user = SubFactory(UserFactory)
+    recipe = SubFactory(RecipeFactory, user=SelfAttribute("..user", None))
+    ingredient = SubFactory(IngredientFactory, user=SelfAttribute("..user", None))
+
+    @classmethod
+    def _create(cls, model_class, user, *args, **kwargs):
+        return super()._create(model_class, *args, **kwargs)

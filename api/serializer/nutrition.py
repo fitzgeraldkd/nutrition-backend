@@ -78,7 +78,7 @@ class RecipeSerializer(Serializer):
 
 class RecipeIngredientSerializer(Serializer):
     validation_fields = {
-        "amount": {"type": float, "required": False},
+        "amount": {"type": (float, int), "required": False},
         "amount_unit_text": {"type": str, "required": False},
         "ingredient_id": {"type": int, "required": True},
         "recipe_id": {"type": int, "required": True},

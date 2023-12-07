@@ -1,12 +1,27 @@
 from flask_login import login_required
 
-from api.model.nutrition import Ingredient, Instruction, Recipe
+from api.model.nutrition import Ingredient, Instruction, Recipe, RecipeIngredient
 from api.route.utils import SerializedResource
 from api.serializer.nutrition import (
     IngredientSerializer,
     InstructionSerializer,
     RecipeSerializer,
+    RecipeIngredientSerializer,
 )
+
+
+class RecipeIngredientAPI(SerializedResource):
+    decorators = [login_required]
+    model = RecipeIngredient
+    serializer = RecipeIngredientSerializer()
+    pk_param = "recipe_ingredient_id"
+
+    def _get_parent_owners(self, payload: dict):
+        ingredient = Ingredient.query.filter_by(
+            id=payload["ingredient_id"]
+        ).one_or_404()
+        recipe = Recipe.query.filter_by(id=payload["recipe_id"]).one_or_404()
+        return [ingredient.get_owner(), recipe.get_owner()]
 
 
 class IngredientAPI(SerializedResource):

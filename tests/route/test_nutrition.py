@@ -1,15 +1,17 @@
 from flask_login import login_user
 
-from api.model.nutrition import Ingredient, Instruction, Recipe
+from api.model.nutrition import Ingredient, Instruction, Recipe, RecipeIngredient
 from api.serializer.nutrition import (
     IngredientSerializer,
     InstructionSerializer,
+    RecipeIngredientSerializer,
     RecipeSerializer,
 )
 from tests.factories import (
     IngredientFactory,
     InstructionFactory,
     RecipeFactory,
+    RecipeIngredientFactory,
     UserFactory,
 )
 from tests.utils import ApiTestCase
@@ -60,8 +62,8 @@ class IngredientTests(ApiTestCase):
 
     def test_list(self):
         owner = UserFactory()
-        ingredient_1 = IngredientFactory(user=owner, name="Ginger")
-        ingredient_2 = IngredientFactory(user=owner, name="Garlic")
+        ingredient_1 = IngredientFactory(user=owner)
+        ingredient_2 = IngredientFactory(user=owner)
 
         response = self.client.get(self.base_url)
         self.assertEqual(response.status_code, 401)
@@ -341,3 +343,118 @@ class RecipeTests(ApiTestCase):
         recipe = Recipe.query.filter_by(id=response.json["id"]).one()
         self.assertDictEqual(response.json, RecipeSerializer().serialize(recipe))
         self.assertEqual(recipe.user_id, user.id)
+
+
+class RecipeIngredientTests(ApiTestCase):
+    base_url = "/api/v1.0/recipe-ingredients"
+
+    def test_delete(self):
+        recipe_ingredient = RecipeIngredientFactory()
+
+        response = self.client.delete(f"{self.base_url}/{recipe_ingredient.id}")
+        self.assertEqual(response.status_code, 401)
+
+        login_user(UserFactory())
+        response = self.client.delete(f"{self.base_url}/{recipe_ingredient.id}")
+        self.assertEqual(response.status_code, 403)
+
+        login_user(recipe_ingredient.get_owner())
+        response = self.client.delete(f"{self.base_url}/{recipe_ingredient.id}")
+        self.assertEqual(response.status_code, 204)
+
+        response = self.client.delete(f"{self.base_url}/{recipe_ingredient.id}")
+        self.assertEqual(response.status_code, 404)
+
+        recipe_ingredient = RecipeIngredient.query.filter_by(
+            id=recipe_ingredient.id
+        ).one_or_none()
+        self.assertIsNone(recipe_ingredient)
+
+    def test_get(self):
+        recipe_ingredient = RecipeIngredientFactory()
+
+        response = self.client.get(f"{self.base_url}/-1")
+        self.assertEqual(response.status_code, 401)
+
+        login_user(UserFactory())
+        response = self.client.get(f"{self.base_url}/-1")
+        self.assertEqual(response.status_code, 404)
+
+        response = self.client.get(f"{self.base_url}/{recipe_ingredient.id}")
+        self.assertEqual(response.status_code, 403)
+
+        login_user(recipe_ingredient.get_owner())
+        response = self.client.get(f"{self.base_url}/{recipe_ingredient.id}")
+        self.assertEqual(response.status_code, 200)
+        self.assertDictEqual(
+            response.json, RecipeIngredientSerializer().serialize(recipe_ingredient)
+        )
+
+    def test_list(self):
+        owner = UserFactory()
+        recipe_ingredient_1 = RecipeIngredientFactory(user=owner)
+        recipe_ingredient_2 = RecipeIngredientFactory(user=owner)
+
+        response = self.client.get(self.base_url)
+        self.assertEqual(response.status_code, 401)
+
+        # TODO: Filter by owner and test.
+
+        login_user(owner)
+        response = self.client.get(self.base_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertListEqual(
+            response.json,
+            RecipeIngredientSerializer().serialize_many(
+                [recipe_ingredient_1, recipe_ingredient_2]
+            ),
+        )
+
+    def test_patch(self):
+        recipe_ingredient = RecipeIngredientFactory(amount=1)
+        payload = {"amount": 2, "amount_unit_text": "ounce"}
+
+        response = self.client.patch(f"{self.base_url}/-1", json=payload)
+        self.assertEqual(response.status_code, 401)
+
+        login_user(UserFactory())
+        response = self.client.patch(f"{self.base_url}/-1", json=payload)
+        self.assertEqual(response.status_code, 404)
+
+        response = self.client.patch(
+            f"{self.base_url}/{recipe_ingredient.id}", json=payload
+        )
+        self.assertEqual(response.status_code, 403)
+
+        login_user(recipe_ingredient.get_owner())
+        response = self.client.patch(
+            f"{self.base_url}/{recipe_ingredient.id}", json=payload
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(recipe_ingredient.amount, 2)
+        self.assertEqual(recipe_ingredient.amount_unit_text, "ounce")
+        self.assertDictEqual(
+            response.json, RecipeIngredientSerializer().serialize(recipe_ingredient)
+        )
+
+    def test_post(self):
+        owner = UserFactory()
+        recipe = RecipeFactory(user=owner)
+        ingredient = IngredientFactory(user=owner)
+        other_ingredient = IngredientFactory()
+        payload = {"recipe_id": recipe.id, "ingredient_id": ingredient.id, "amount": 1}
+
+        response = self.client.post(self.base_url, json=payload)
+        self.assertEqual(response.status_code, 401)
+
+        login_user(UserFactory())
+        response = self.client.post(self.base_url, json={})
+        self.assertEqual(response.status_code, 400)
+
+        response = self.client.post(self.base_url, json=payload)
+        print(response.json)
+        self.assertEqual(response.status_code, 403)
+
+        login_user(owner)
+        response = self.client.post(self.base_url, json=payload)
+        self.assertEqual(response.status_code, 201)

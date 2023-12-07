@@ -5,7 +5,12 @@ from flask_migrate import Migrate
 from flask_restful import Api
 
 from api import create_app, db, login_manager
-from api.route.nutrition import IngredientAPI, InstructionAPI, RecipeAPI
+from api.route.nutrition import (
+    IngredientAPI,
+    InstructionAPI,
+    RecipeAPI,
+    RecipeIngredientAPI,
+)
 from api.route.user import AuthAPI, UserAPI
 
 
@@ -21,6 +26,11 @@ def setup_resources(app):
         "/api/v1.0/instructions/<instruction_id>",
     )
     api.add_resource(RecipeAPI, "/api/v1.0/recipes", "/api/v1.0/recipes/<recipe_id>")
+    api.add_resource(
+        RecipeIngredientAPI,
+        "/api/v1.0/recipe-ingredients",
+        "/api/v1.0/recipe-ingredients/<recipe_ingredient_id>",
+    )
     api.add_resource(UserAPI, "/api/v1.0/users")
 
     CORS(app, resources={r"/api/*": {"origins": "*"}})
