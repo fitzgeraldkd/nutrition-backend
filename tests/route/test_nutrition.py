@@ -452,7 +452,6 @@ class RecipeIngredientTests(ApiTestCase):
         self.assertEqual(response.status_code, 400)
 
         response = self.client.post(self.base_url, json=payload)
-        print(response.json)
         self.assertEqual(response.status_code, 403)
 
         login_user(owner)
