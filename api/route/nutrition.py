@@ -1,4 +1,4 @@
-from flask_login import login_required
+from flask_login import current_user, login_required
 
 from api.model.nutrition import Ingredient, Instruction, Recipe, RecipeIngredient
 from api.route.utils import SerializedResource
@@ -15,6 +15,9 @@ class RecipeIngredientAPI(SerializedResource):
     model = RecipeIngredient
     serializer = RecipeIngredientSerializer()
     pk_param = "recipe_ingredient_id"
+    
+    def _apply_filter(self, query):
+        return query.join(Recipe).filter(Recipe.user == current_user)
 
     def _get_parent_owners(self, payload: dict):
         ingredient = Ingredient.query.filter_by(
@@ -36,6 +39,9 @@ class InstructionAPI(SerializedResource):
     model = Instruction
     serializer = InstructionSerializer()
     pk_param = "instruction_id"
+    
+    def _apply_filter(self, query):
+        return query.join(Recipe).filter(Recipe.user == current_user)
 
     def _get_parent_owners(self, payload: dict):
         recipe = Recipe.query.filter_by(id=payload["recipe_id"]).one_or_404()

@@ -64,11 +64,10 @@ class IngredientTests(ApiTestCase):
         owner = UserFactory()
         ingredient_1 = IngredientFactory(user=owner)
         ingredient_2 = IngredientFactory(user=owner)
+        IngredientFactory()
 
         response = self.client.get(self.base_url)
         self.assertEqual(response.status_code, 401)
-
-        # TODO: Filter by recipe owner and test.
 
         login_user(owner)
         response = self.client.get(self.base_url)
@@ -169,15 +168,10 @@ class InstructionTests(ApiTestCase):
         recipe = RecipeFactory()
         instruction_1 = InstructionFactory(index=1, recipe=recipe, text="Preheat oven.")
         instruction_2 = InstructionFactory(index=2, recipe=recipe, text="Dice onions.")
+        InstructionFactory()
 
         response = self.client.get(self.base_url)
         self.assertEqual(response.status_code, 401)
-
-        # TODO: Filter by recipe owner.
-        # login_user(UserFactory())
-        # response = self.client.get(self.base_url)
-        # self.assertEqual(response.status_code, 200)
-        # self.assertListEqual(response.json, [])
 
         login_user(recipe.get_owner())
         response = self.client.get(self.base_url)
@@ -284,15 +278,10 @@ class RecipeTests(ApiTestCase):
     def test_list(self):
         recipe_1 = RecipeFactory(name="Butter Chicken")
         recipe_2 = RecipeFactory(name="Pad Thai", user=recipe_1.user)
+        RecipeFactory()
 
         response = self.client.get(self.base_url)
         self.assertEqual(response.status_code, 401)
-
-        login_user(UserFactory())
-        response = self.client.get(self.base_url)
-        self.assertEqual(response.status_code, 200)
-        # TODO: Filter by recipe owner.
-        # self.assertListEqual(response.json, [])
 
         login_user(recipe_1.get_owner())
         response = self.client.get(self.base_url)
@@ -394,11 +383,10 @@ class RecipeIngredientTests(ApiTestCase):
         owner = UserFactory()
         recipe_ingredient_1 = RecipeIngredientFactory(user=owner)
         recipe_ingredient_2 = RecipeIngredientFactory(user=owner)
+        RecipeIngredientFactory()
 
         response = self.client.get(self.base_url)
         self.assertEqual(response.status_code, 401)
-
-        # TODO: Filter by owner and test.
 
         login_user(owner)
         response = self.client.get(self.base_url)
@@ -441,7 +429,6 @@ class RecipeIngredientTests(ApiTestCase):
         owner = UserFactory()
         recipe = RecipeFactory(user=owner)
         ingredient = IngredientFactory(user=owner)
-        other_ingredient = IngredientFactory()
         payload = {"recipe_id": recipe.id, "ingredient_id": ingredient.id, "amount": 1}
 
         response = self.client.post(self.base_url, json=payload)

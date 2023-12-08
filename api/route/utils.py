@@ -19,6 +19,9 @@ class SerializedResource(Resource):
     serializer = Serializer()
     pk_param = "id"
 
+    def _apply_filter(self, query):
+        return query.filter(self.model.user == current_user)
+
     def _get_parent_owners(self, payload: dict) -> List[User]:
         return []
 
@@ -36,7 +39,7 @@ class SerializedResource(Resource):
 
     def delete(self, **kwargs) -> Tuple[dict, int]:
         id = kwargs.pop(self.pk_param)
-        instance = self.model.query.filter_by(id=id, **kwargs).one_or_404()
+        instance = db.get_or_404(self.model, id)
         self._authorize(instance)
 
         db.session.delete(instance)
@@ -48,13 +51,13 @@ class SerializedResource(Resource):
         if id is None:
             return self.list()
 
-        instance = self.model.query.filter_by(id=id, **kwargs).one_or_404()
+        instance = db.get_or_404(self.model, id)
         self._authorize(instance)
 
         return self.serializer.serialize(instance), 200
 
     def list(self) -> Tuple[List[dict], int]:
-        instances = self.model.query.all()
+        instances = db.session.execute(self._apply_filter(db.select(self.model))).scalars()
         return self.serializer.serialize_many(instances), 200
 
     def patch(self, **kwargs) -> Tuple[dict, int]:
@@ -64,7 +67,7 @@ class SerializedResource(Resource):
         if errors:
             return errors, 400
 
-        instance = self.model.query.filter_by(id=id, **kwargs).one_or_404()
+        instance = db.get_or_404(self.model, id)
         self._authorize(instance)
 
         for key, value in payload.items():
