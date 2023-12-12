@@ -15,7 +15,7 @@ class RecipeIngredientAPI(SerializedResource):
     model = RecipeIngredient
     serializer = RecipeIngredientSerializer()
     pk_param = "recipe_ingredient_id"
-    
+
     def _apply_filter(self, query):
         return query.join(Recipe).filter(Recipe.user == current_user)
 
@@ -39,7 +39,7 @@ class InstructionAPI(SerializedResource):
     model = Instruction
     serializer = InstructionSerializer()
     pk_param = "instruction_id"
-    
+
     def _apply_filter(self, query):
         return query.join(Recipe).filter(Recipe.user == current_user)
 

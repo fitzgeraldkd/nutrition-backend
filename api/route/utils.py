@@ -57,15 +57,17 @@ class SerializedResource(Resource):
         return self.serializer.serialize(instance), 200
 
     def list(self) -> Tuple[List[dict], int]:
-        instances = db.session.execute(self._apply_filter(db.select(self.model))).scalars()
+        instances = db.session.execute(
+            self._apply_filter(db.select(self.model))
+        ).scalars()
         return self.serializer.serialize_many(instances), 200
 
     def patch(self, **kwargs) -> Tuple[dict, int]:
         id = kwargs.pop(self.pk_param)
         payload = request.get_json()
-        errors = self.serializer.validate(payload, HTTPMethod.PATCH)
-        if errors:
-            return errors, 400
+        error = self.serializer.validate(payload, HTTPMethod.PATCH)
+        if error:
+            return error, 400
 
         instance = db.get_or_404(self.model, id)
         self._authorize(instance)
@@ -77,9 +79,9 @@ class SerializedResource(Resource):
 
     def post(self) -> Tuple[dict, int]:
         payload = request.get_json()
-        errors = self.serializer.validate(payload, HTTPMethod.POST)
-        if errors:
-            return errors, 400
+        error = self.serializer.validate(payload, HTTPMethod.POST)
+        if error:
+            return error, 400
 
         self._authorize_post(payload)
 

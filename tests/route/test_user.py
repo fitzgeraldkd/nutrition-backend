@@ -23,13 +23,13 @@ class UserTests(ApiTestCase):
             "/api/v1.0/users", json={"email": "kenny@kdfitz.com"}
         )
         self.assertEqual(response.status_code, 400)
-        self.assertDictEqual(response.json, {"error": "A password is required."})
+        self.assertEqual(response.json, "These fields are required: password")
 
         response = self.client.post(
             "/api/v1.0/users", json={"password": "TestPassword"}
         )
         self.assertEqual(response.status_code, 400)
-        self.assertDictEqual(response.json, {"error": "An email is required."})
+        self.assertEqual(response.json, "These fields are required: email")
 
     def test_prevent_duplicates(self):
         UserFactory(email="existing@user.com")
@@ -38,9 +38,9 @@ class UserTests(ApiTestCase):
             json={"email": "existing@user.com", "password": "TestPassword"},
         )
         self.assertEqual(response.status_code, 400)
-        self.assertDictEqual(
+        self.assertEqual(
             response.json,
-            {"error": "An account with this email address already exists."},
+            "An account with this email address already exists.",
         )
 
 
@@ -57,7 +57,7 @@ class AuthTests(ApiTestCase):
             },
         )
         self.assertEqual(response.status_code, 400)
-        self.assertDictEqual(response.json, {"error": "Invalid login credentials."})
+        self.assertEqual(response.json, "Invalid login credentials.")
 
         # An invalid password returns a 400.
         response = self.client.post(
@@ -68,7 +68,7 @@ class AuthTests(ApiTestCase):
             },
         )
         self.assertEqual(response.status_code, 400)
-        self.assertDictEqual(response.json, {"error": "Invalid login credentials."})
+        self.assertEqual(response.json, "Invalid login credentials.")
 
         # Providing the correct credentials sets the user_id in the session.
         response = self.client.post(
@@ -95,7 +95,7 @@ class AuthTests(ApiTestCase):
 
         # An anonymous user cannot fetch auth info.
         response = self.client.get("/api/v1.0/auth")
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 200)
         self.assertDictEqual(response.json, {})
 
         # The email field is case-insensitive.

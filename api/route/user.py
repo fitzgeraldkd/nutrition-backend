@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from bcrypt import gensalt, hashpw
 from flask import request
 from flask_login import current_user, login_user, logout_user
@@ -6,24 +8,28 @@ from sqlalchemy import func
 
 from api import db
 from api.model.user import User
+from api.route.utils import SerializedResource
+from api.serializer.user import UserSerializer
+from api.utils.constants import HTTPMethod
 
 
-class UserAPI(Resource):
+class UserAPI(SerializedResource):
+    serializer = UserSerializer()
+
     def post(self):
         payload = request.get_json()
+        error = self.serializer.validate(payload, HTTPMethod.POST)
+        if error:
+            return error, 400
+
         email = payload.get("email")
         password = payload.get("password")
-
-        if not email:
-            return {"error": "An email is required."}, 400
-        if not password:
-            return {"error": "A password is required."}, 400
 
         existing_user = User.query.filter(
             func.lower(User.email) == func.lower(email)
         ).first()
         if existing_user:
-            return {"error": "An account with this email address already exists."}, 400
+            return "An account with this email address already exists.", 400
 
         user = User(
             email=email,
@@ -37,9 +43,9 @@ class UserAPI(Resource):
 class AuthAPI(Resource):
     def get(self):
         if not current_user.is_authenticated:
-            return {}, 400
+            return {}, 200
 
-        return {"user": current_user.id}
+        return {"user": current_user.id}, 200
 
     def delete(self):
         logout_user()
@@ -54,10 +60,10 @@ class AuthAPI(Resource):
         ).one_or_none()
 
         if user is None:
-            return {"error": "Invalid login credentials."}, 400
+            return "Invalid login credentials.", 400
 
         if user.verify_password(password):
             login_user(user)
             return {}
         else:
-            return {"error": "Invalid login credentials."}, 400
+            return "Invalid login credentials.", 400

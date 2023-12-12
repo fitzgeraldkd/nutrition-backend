@@ -17,6 +17,7 @@ def create_app():
     )
 
     app.config["SQLALCHEMY_DATABASE_URI"] = db_uri
+    app.config["SESSION_COOKIE_NAME"] = "session_nutrition"
     app.secret_key = os.getenv("secret_key")
 
     return app

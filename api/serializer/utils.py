@@ -18,23 +18,22 @@ class Serializer:
     def serialize_many(self, instances) -> List[dict]:
         return [self.serialize(instance) for instance in instances]
 
-    def validate(self, data: dict, method: str, strict=True) -> Dict[str, List[str]]:
-        errors = defaultdict(list)
-
+    def validate(self, data: dict, method: str, strict=True) -> str:
         if method == HTTPMethod.POST:
+            missing_keys = []
             for key, validation in self.validation_fields.items():
                 if validation["required"] and key not in data:
-                    errors[key].append("This field is required.")
+                    missing_keys.append(key)
+            if missing_keys:
+                return f'These fields are required: {", ".join(missing_keys)}'
 
         for key, value in data.items():
             if strict and key not in self.validation_fields:
-                errors[key].append("Unexpected key provided.")
+                return f"Unexpected field: {key}"
             elif not isinstance(value, self.validation_fields[key]["type"]):
-                errors[key].append("Type mismatch.")
+                return f"Type mismatch: {key}"
             elif self.validation_fields[key]["required"] and is_empty(value):
-                errors[key].append("This field cannot be empty.")
-
-        return errors
+                return f"Field cannot be empty: {key}"
 
 
 def is_empty(value) -> bool:
