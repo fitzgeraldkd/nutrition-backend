@@ -5,6 +5,7 @@ from flask_migrate import Migrate
 from flask_restful import Api
 
 from api import create_app, db, login_manager
+from api.route.dashboard import DashboardAPI
 from api.route.nutrition import (
     IngredientAPI,
     InstructionAPI,
@@ -17,6 +18,7 @@ from api.route.user import AuthAPI, UserAPI
 def setup_resources(app):
     api = Api(app)
     api.add_resource(AuthAPI, "/api/v1.0/auth")
+    api.add_resource(DashboardAPI, "/api/v1.0/dashboard")
     api.add_resource(
         IngredientAPI, "/api/v1.0/ingredients", "/api/v1.0/ingredients/<ingredient_id>"
     )
