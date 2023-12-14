@@ -10,9 +10,11 @@ class DashboardAPI(Resource):
 
     def get(self, **kwargs):
         ingredient_count = (
-            db.session.query(Ingredient).filter_by(user=current_user).count()
+            db.session.query(Ingredient).filter(Ingredient.user == current_user).count()
         )
-        recipe_count = db.session.query(Recipe).filter_by(user=current_user).count()
+        recipe_count = (
+            db.session.query(Recipe).filter(Recipe.user == current_user).count()
+        )
 
         return {
             "recipes": recipe_count,

@@ -35,6 +35,7 @@ def setup_resources(app):
     )
     api.add_resource(UserAPI, "/api/v1.0/users")
 
+    # TODO: Limit origins to specific IP address(es).
     CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=True)
 
 
