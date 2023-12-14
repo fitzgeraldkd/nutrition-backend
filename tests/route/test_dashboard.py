@@ -21,6 +21,9 @@ class DashboardTests(ApiTestCase):
         [IngredientFactory(user=user) for _ in range(7)]
         [IngredientFactory() for _ in range(3)]
 
+        response = self.client.get(self.base_url)
+        self.assertEqual(response.status_code, 401)
+
         login_user(user)
         response = self.client.get(self.base_url)
         self.assertEqual(response.status_code, 200)
