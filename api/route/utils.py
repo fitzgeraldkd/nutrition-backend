@@ -74,6 +74,7 @@ class SerializedResource(Resource):
 
         for key, value in payload.items():
             setattr(instance, key, value)
+        db.session.commit()
 
         return self.serializer.serialize(instance), 200
 
