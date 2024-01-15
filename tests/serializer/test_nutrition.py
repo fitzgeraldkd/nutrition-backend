@@ -12,7 +12,7 @@ from tests.factories import (
     InstructionFactory,
     RecipeFactory,
     RecipeIngredientFactory,
-    UserFactory
+    UserFactory,
 )
 from tests.utils import ApiTestCase
 
@@ -108,18 +108,18 @@ class RecipeSerializerTests(ApiTestCase):
         self.assertEqual(errors, "These fields are required: name")
 
         # On success, the user_id should be appended to the data.
-        data = { "name": "Grilled Cheese" }
+        data = {"name": "Grilled Cheese"}
         errors = RecipeSerializer().validate(data, HTTPMethod.POST)
         self.assertIsNone(errors)
-        self.assertDictEqual(data, {"name": "Grilled Cheese", "user_id": user.id })
+        self.assertDictEqual(data, {"name": "Grilled Cheese", "user_id": user.id})
 
         # Check that optional fields can be included.
-        data = { "name": "Grilled Cheese", "source": "Internet" }
+        data = {"name": "Grilled Cheese", "source": "Internet"}
         errors = RecipeSerializer().validate(data, HTTPMethod.POST)
         self.assertIsNone(errors)
 
         # Check that the user_id can't be manually passed in the POST data.
-        data = { "name": "Grilled Cheese", "user_id": -1 }
+        data = {"name": "Grilled Cheese", "user_id": -1}
         errors = RecipeSerializer().validate(data, HTTPMethod.POST)
         self.assertEqual(errors, "Unexpected field: user_id")
 
