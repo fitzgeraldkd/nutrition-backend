@@ -53,6 +53,7 @@ class InstructionSerializer(Serializer):
 class RecipeSerializer(Serializer):
     validation_fields = {
         "name": {"type": str, "required": True},
+        "source": {"type": str, "required": False},
     }
 
     def serialize(self, instance: Recipe):
@@ -71,6 +72,8 @@ class RecipeSerializer(Serializer):
         errors = super().validate(data, method, strict)
 
         if method == HTTPMethod.POST:
+            if not current_user.is_authenticated:
+                return "Must be signed in."
             data["user_id"] = current_user.id
 
         return errors

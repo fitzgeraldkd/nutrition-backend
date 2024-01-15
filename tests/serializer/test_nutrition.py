@@ -1,14 +1,18 @@
+from flask_login import login_user
+
 from api.serializer.nutrition import (
     IngredientSerializer,
     InstructionSerializer,
     RecipeSerializer,
     RecipeIngredientSerializer,
 )
+from api.utils.constants import HTTPMethod
 from tests.factories import (
     IngredientFactory,
     InstructionFactory,
     RecipeFactory,
     RecipeIngredientFactory,
+    UserFactory
 )
 from tests.utils import ApiTestCase
 
@@ -93,6 +97,31 @@ class RecipeSerializerTests(ApiTestCase):
                 {"id": recipe_2.id, "name": "Pad Thai"},
             ],
         )
+
+    def test_validate_post(self):
+        errors = RecipeSerializer().validate({}, HTTPMethod.POST)
+        self.assertEqual(errors, "Must be signed in.")
+
+        user = UserFactory()
+        login_user(user)
+        errors = RecipeSerializer().validate({}, HTTPMethod.POST)
+        self.assertEqual(errors, "These fields are required: name")
+
+        # On success, the user_id should be appended to the data.
+        data = { "name": "Grilled Cheese" }
+        errors = RecipeSerializer().validate(data, HTTPMethod.POST)
+        self.assertIsNone(errors)
+        self.assertDictEqual(data, {"name": "Grilled Cheese", "user_id": user.id })
+
+        # Check that optional fields can be included.
+        data = { "name": "Grilled Cheese", "source": "Internet" }
+        errors = RecipeSerializer().validate(data, HTTPMethod.POST)
+        self.assertIsNone(errors)
+
+        # Check that the user_id can't be manually passed in the POST data.
+        data = { "name": "Grilled Cheese", "user_id": -1 }
+        errors = RecipeSerializer().validate(data, HTTPMethod.POST)
+        self.assertEqual(errors, "Unexpected field: user_id")
 
 
 class RecipeIngredientSerializerTests(ApiTestCase):
